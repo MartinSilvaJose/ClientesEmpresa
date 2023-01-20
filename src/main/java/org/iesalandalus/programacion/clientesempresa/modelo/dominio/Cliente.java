@@ -1,15 +1,32 @@
 package org.iesalandalus.programacion.clientesempresa.modelo.dominio;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Cliente {
-	private String ER_CORREO,ER_DNI,ER_TELEFONO,FORMATO_FECHA,nombre,dni,correo,telefono;
-	private Date fechaNacimiento;
+	private String nombre,dni,correo,telefono;
+	private LocalDate fechaNacimiento;
+	private String ER_DNI="([0-9]{8})([Tt|Rr|Ww|Aa|Gg|Mm|Yy|Ff|Pp|Dd|Xx|Bb|Nn|Jj|Zz|Ss|Qq|Vv|Hh|Ll|Cc|Kk|Ee])";
+	private String ER_TELEFONO="[0-9]{9}";
+	private String ER_CORREO=".+@.+\\..+";
+	private String FORMATO_FECHA ="dd/MM/yyyy";
 	
-	public String formateaNombre(String nombre) {
+	
+	private String formateaNombre(String nombre) {
+		
+		String [] palabras= nombre.trim().split("\\s");
+		
+		for(int i=0;i<nombre.length();i++) {
+			String palabra=palabras[i].trim();
+			palabra=palabra.toUpperCase().charAt(0)+"";
+			nombre=palabra+" ";
+		}
+		return nombre;
+		/*
 		if(!nombre.matches("[a-z A-Z]+")) {
 			throw new IllegalArgumentException("ERROR: El nombre solo puede contener las letras del abecedario y espacios.");
 		}
@@ -26,10 +43,11 @@ public class Cliente {
 			}
 			stg+=letraActual;
 		}
-		return stg;
+		return stg;*/
 	}
-	public boolean comprobarLetraDni(String dni) {
-		Pattern pat=Pattern.compile("([0-9]{8})([Tt|Rr|Ww|Aa|Gg|Mm|Yy|Ff|Pp|Dd|Xx|Bb|Nn|Jj|Zz|Ss|Qq|Vv|Hh|Ll|Cc|Kk|Ee])");
+		
+	private boolean comprobarLetraDni(String dni) {
+		Pattern pat=Pattern.compile(ER_DNI);
 		Matcher mat=pat.matcher(dni);
 
 		if(!mat.find()) {
@@ -175,31 +193,50 @@ public class Cliente {
 	public String getNombre() {
 		return nombre;
 	}
+	
 	public void setNombre(String nombre) {
-		if(nombre.matches("[a-z A-Z]")) {
-			this.nombre = nombre;
+		if(nombre==null) {
+			throw new NullPointerException("ERROR:La cadena nombre no puede ser null.");
+		}
+		if(nombre.trim().isEmpty()) {
+			throw new IllegalArgumentException("ERROR:La cadena nombre no puede estar vacía");
 		}
 		else {
-			throw new IllegalArgumentException("ERROR:El nombre debe de contener únicamente carácteres del abecedario.");
+			this.nombre=formateaNombre(nombre);
 		}
 	}
 	public String getDni() {
 		return dni;
 	}
-	public void setDni(String dni) {
-		if(dni.matches("([0-9]{8})([Tt|Rr|Ww|Aa|Gg|Mm|Yy|Ff|Pp|Dd|Xx|Bb|Nn|Jj|Zz|Ss|Qq|Vv|Hh|Ll|Cc|Kk|Ee])")) {
-			this.dni = dni;
+	private void setDni(String dni) {
+		if(dni==null) {
+			throw new NullPointerException("ERROR:La cadena DNI no puede contener un null.");
+		}
+		if(dni.trim().isEmpty()) {
+			throw new IllegalArgumentException("ERROR:La cadena DNI no puede estar vacía.");
+		}
+		if(dni.matches(ER_DNI)) {
+			if(comprobarLetraDni(dni)) {
+				this.dni = dni;
+			}	
 		}
 		else {
-			throw new IllegalArgumentException("ERROR:El DNI introducido no esta bien formado.");
+			throw new IllegalArgumentException("ERROR:El DNI introducido no es válido.");
 		}
 	}
 	public String getCorreo() {
 		return correo;
 	}
 	public void setCorreo(String correo) {
+		if(correo==null) {
+			throw new NullPointerException("ERROR:La cadena correo no puede contener un null.");
+		}
+		if(correo.trim().isEmpty()) {
+			
+			throw new IllegalArgumentException("ERROR:La cadena correo no puede estar vacía.");
+		}
 
-		if(correo.matches(".+@.+\\..+")) {
+		if(correo.matches(ER_CORREO)) {
 			this.correo = correo;
 		}
 		else {
@@ -210,38 +247,54 @@ public class Cliente {
 		return telefono;
 	}
 	public void setTelefono(String telefono) {
-		this.telefono = telefono;
-		if(telefono.matches("[0-9]{9}")) {
+		if(telefono==null) {
+			throw new NullPointerException("ERROR:La cadena telefono no puede contener null.");
+		}
+		if(telefono.trim().isEmpty()) {
+			throw new IllegalArgumentException("La cadena telefono no puede estar vacía.");
+		}
+		if(telefono.matches(ER_TELEFONO)) {
 			this.telefono = telefono;
 		}
 		else {
 			throw new IllegalArgumentException("ERROR:El teléfono introducido no esta bien formado.");
 		}
 	}
-	public Date getFechaNacimiento() {
+	public LocalDate getFechaNacimiento() {
 		return fechaNacimiento;
 	}
-	public void setFechaNacimiento(Date fechaNacimiento) {
+	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+		if(fechaNacimiento==null) {
+			throw new NullPointerException("ERROR:La cadena telefono no puede contener null.");
+		}
+		
+		fechaNacimiento.format(DateTimeFormatter.ofPattern(FORMATO_FECHA));
+		
 		this.fechaNacimiento = fechaNacimiento;
+
 	}
-	public Cliente(String nombre, String dni, String correo, String telefono, Date fechaNacimiento) {
-		this.nombre = nombre;
-		this.dni = dni;
-		this.correo = correo;
-		this.telefono = telefono;
-		this.fechaNacimiento = fechaNacimiento;
+	public Cliente(String nombre, String dni, String correo, String telefono, LocalDate fechaNacimiento) {
+		setNombre(nombre);
+		setDni(dni);
+		setCorreo(correo);
+		setTelefono(telefono);
+		setFechaNacimiento(fechaNacimiento);
 	}
 	public Cliente(Cliente c) {
-		this.nombre = c.nombre;
-		this.dni = c.dni;
-		this.correo = c.correo;
-		this.telefono = c.telefono;
-		this.fechaNacimiento = c.fechaNacimiento;
+		if(c==null) {
+			throw new NullPointerException("ERROR");
+		}
+		setNombre(c.getNombre());
+		setDni(c.getDni());
+		setCorreo(c.getCorreo());
+		setTelefono(c.getTelefono());
+		setFechaNacimiento(c.getFechaNacimiento());
 	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(dni);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -254,7 +307,7 @@ public class Cliente {
 		return Objects.equals(dni, other.dni);
 	}
 	
-	public static String getIniciales(String nombre) {
+	private static String getIniciales(String nombre) {
 		String stg="";
 		
 		for(int i=0;i<nombre.length();i++) {
@@ -268,12 +321,8 @@ public class Cliente {
 	}
 	@Override
 	public String toString() {
-		return "Cliente [nombre=" +"("+getIniciales(formateaNombre(nombre))+")"+ nombre + ", dni=" + dni + ", correo=" + correo + ", telefono=" + telefono
+		return "Cliente [nombre=" +"("+getIniciales(getNombre())+")"+ nombre + ", dni=" + dni + ", correo=" + correo + ", telefono=" + telefono
 				+ ", fechaNacimiento=" + fechaNacimiento + "]";
 	}
-	
-	
-	
-	
-			
+		
 }
