@@ -3,8 +3,16 @@ import org.iesalandalus.programacion.clientesempresa.modelo.dominio.*;
 public class Clientes {
 	private int capacidad;
 	private int tamano;
-	Cliente [] coleccionClientes;
+	private Cliente [] coleccionClientes;
 	
+	public Clientes(int capacidad) {
+		if (capacidad<=0) {
+			throw new IllegalArgumentException("ERROR:La capacidad de clientes no puede ser menor que 0.");
+		}
+		this.capacidad=capacidad;
+		this.tamano=0;
+		coleccionClientes= new Cliente[capacidad];
+	}
 	public int getCapacidad() {
 		return capacidad;
 	}
@@ -46,6 +54,7 @@ public class Clientes {
 		
 	}
 	private int buscarIndice(Cliente cliente) {
+		
 		int indice=0;
 		for(int i=0;i<coleccionClientes.length;i++) {
 			if (cliente.equals(coleccionClientes[i])) {
@@ -62,16 +71,22 @@ public class Clientes {
 	}
 	public void insertar(Cliente cliente){
 		
+		if(capacidadSuperada(capacidad)) {
+			throw new IllegalArgumentException("ERROR:No caben más clientes en la lista");
+		}
+		if(tamanoSuperado(capacidad)) {
+			throw new IllegalArgumentException("ERROR:Se esta superando el tamaño de la lista");
+		}
 		for(int i=0;i<coleccionClientes.length;i++) {
 			if(coleccionClientes[i]==null) {
 				coleccionClientes[i]=new Cliente(cliente);
 			}
-			else {
-				throw new IllegalArgumentException("ERROR:La colección de clientes esta llena.");
-			}
-		}	
+		}
 	}
 	public void buscar(Cliente cliente) {
+		if(cliente==null) {
+			throw new NullPointerException("ERROR:El cliente a borrar no puede ser null.");
+		}
 		for(int i=0;i<coleccionClientes.length;i++) {
 			if (cliente.equals(coleccionClientes[i])) {
 				coleccionClientes[i]=new Cliente(cliente);
@@ -89,15 +104,14 @@ public class Clientes {
 		}
 	}
 	public void borrar(Cliente cliente) {
-		for(int i=0;i<coleccionClientes.length;i++) {
-			if (cliente.equals(coleccionClientes[i])){
-				while(coleccionClientes[(i+1)]!=null && i<coleccionClientes.length) {
-					coleccionClientes[i]=coleccionClientes[i+1];
-					i++;
-				}
-
-			}
+		if(cliente==null) {
+			throw new NullPointerException("ERROR:El cliente a borrar no puede ser null.");
 		}
+		else {
+			desplazarUnaPosicionHaciaIzquierda(buscarIndice(cliente));
+		}
+
+
 	}
 }
 
