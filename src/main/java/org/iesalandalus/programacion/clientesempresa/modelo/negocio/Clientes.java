@@ -1,118 +1,122 @@
 package org.iesalandalus.programacion.clientesempresa.modelo.negocio;
-import org.iesalandalus.programacion.clientesempresa.modelo.dominio.*;
+
+import javax.naming.OperationNotSupportedException;
+
+import org.iesalandalus.programacion.clientesempresa.modelo.dominio.Cliente;
+
 public class Clientes {
 	private int capacidad;
 	private int tamano;
-	private Cliente [] coleccionClientes;
+	public Cliente [] coleccionClientes;
 	
-	public Clientes(int capacidad) {
-		if (capacidad<=0) {
-			throw new IllegalArgumentException("ERROR:La capacidad de clientes no puede ser menor que 0.");
+	public Clientes(int capacidad){
+		if(capacidad<1) {
+			throw new IllegalArgumentException("ERROR: La capacidad debe ser mayor que cero.");
 		}
-		this.capacidad=capacidad;
 		this.tamano=0;
-		coleccionClientes= new Cliente[capacidad];
+		this.capacidad=capacidad;
+		this.coleccionClientes=new Cliente[capacidad];
 	}
 	public int getCapacidad() {
-		return capacidad;
+		return this.capacidad;
 	}
 	public int getTamano() {
-		return tamano;
+		return this.tamano;
 	}
-	public Cliente [] get(){
-		for(int i=0;i<coleccionClientes.length;i++) {
-			int indice=0;
-			if (coleccionClientes[i]!=null){
-				coleccionClientes[indice]=new Cliente(coleccionClientes[i]);
-			}
-		}
-		return coleccionClientes;
+
+	private boolean tamanoSuperado(int indice){
+		return indice>=getTamano();
 	}
 	
 	private boolean capacidadSuperada(int indice) {
-		int contador=0;
-		for(int i=indice;i<coleccionClientes.length;i++) {
-			if (coleccionClientes[i]==null) {
-				contador++;
-			}
-		}
-		if (contador==0) {
-			return true;				
-		}
-		else {
-			return false;
-		}
+		return indice>=getCapacidad();
 	}
-	private boolean tamanoSuperado(int indice) {
-		if (indice>coleccionClientes.length) {
-			return true;
-		}
-		else {
-			return false;
-		}
-		
-		
-	}
+	
 	private int buscarIndice(Cliente cliente) {
-		
-		int indice=0;
-		for(int i=0;i<coleccionClientes.length;i++) {
-			if (cliente.equals(coleccionClientes[i])) {
-				indice=i;
-			}
-		}
-		if (indice!=0) {
-			return indice;
-		}
-		else
-			indice=coleccionClientes.length+1;
-		return indice;
-		
-	}
-	public void insertar(Cliente cliente){
-		
-		if(capacidadSuperada(capacidad)) {
-			throw new IllegalArgumentException("ERROR:No caben más clientes en la lista");
-		}
-		if(tamanoSuperado(capacidad)) {
-			throw new IllegalArgumentException("ERROR:Se esta superando el tamaño de la lista");
-		}
-		for(int i=0;i<coleccionClientes.length;i++) {
-			if(coleccionClientes[i]==null) {
-				coleccionClientes[i]=new Cliente(cliente);
-			}
-		}
-	}
-	public void buscar(Cliente cliente) {
 		if(cliente==null) {
-			throw new NullPointerException("ERROR:El cliente a borrar no puede ser null.");
+			throw new NullPointerException("");
 		}
+
 		for(int i=0;i<coleccionClientes.length;i++) {
-			if (cliente.equals(coleccionClientes[i])) {
-				coleccionClientes[i]=new Cliente(cliente);
+			if(cliente.equals(coleccionClientes[i])){
+				return i;
 			}
-			else {
-				cliente=null;
-			}
+		}
+		if(coleccionClientes[0]==null) {
+			return tamano;
+		}else {
+			return tamano+1;
+		}
+
+	}
+	public void insertar(Cliente cliente) throws OperationNotSupportedException {
+		if(cliente==null){
+			throw new NullPointerException("ERROR: No se puede insertar un cliente nulo.");
+		}
+		int indice=buscarIndice(cliente);
+		if(capacidadSuperada(indice)) {
+			throw new OperationNotSupportedException("ERROR: No se aceptan más clientes.");
+		}
+
+		if(coleccionClientes[indice]==null) {
+			coleccionClientes[indice]=new Cliente(cliente);
+			tamano++;
+		}else {
+			throw new OperationNotSupportedException("ERROR: Ya existe un cliente con ese dni.");
 		}
 	}
-	private void desplazarUnaPosicionHaciaIzquierda(int indice) {
-
-		while(coleccionClientes[(indice+1)]!=null && indice<coleccionClientes.length) {
-			coleccionClientes[indice]=coleccionClientes[indice+1];
+	public Cliente buscar(Cliente cliente) {
+		if(cliente==null){
+			throw new NullPointerException("");
+		}
+		
+		for(int i=0;i<coleccionClientes.length;i++) {
+			if(cliente.equals(coleccionClientes[i])) {
+				return new Cliente(coleccionClientes[i]);
+			}
+		}
+		return null;
+		
+	}
+	private void desplazarUnaPosicionHaciaIzquierda(int indice) throws OperationNotSupportedException {
+		if(tamanoSuperado(indice) && indice<0) {
+			throw new OperationNotSupportedException("El indice esta fuera de rango.");
+		}
+		while(!capacidadSuperada(indice)) {
+			coleccionClientes[indice]=new Cliente(coleccionClientes[indice+1]);
 			indice++;
 		}
 	}
-	public void borrar(Cliente cliente) {
-		if(cliente==null) {
-			throw new NullPointerException("ERROR:El cliente a borrar no puede ser null.");
+	public void borrar(Cliente cliente) throws OperationNotSupportedException {
+		if(cliente==null){
+			throw new NullPointerException("ERROR: No se puede borrar un cliente nulo.");
 		}
-		else {
-			desplazarUnaPosicionHaciaIzquierda(buscarIndice(cliente));
+		Cliente clienteEncontrado=buscar(cliente);
+		
+		if(clienteEncontrado!=null) {
+			desplazarUnaPosicionHaciaIzquierda(buscarIndice(clienteEncontrado));	
+		}else {
+			throw new OperationNotSupportedException("El cliente que desea borrar no existe.");
 		}
-
-
 	}
+	private Cliente[] copiaProfundaClientes() {
+		if(coleccionClientes==null) {
+			throw new NullPointerException("ERROR: La coleccion es nula.");
+		}
+		Cliente [] nuevaColeccion=coleccionClientes;
+		for(int i=0;i<coleccionClientes.length;i++) {
+			nuevaColeccion[i]=null;
+			if(coleccionClientes[i]!=null) {
+				nuevaColeccion[i]=new Cliente(coleccionClientes[i]);
+			}
+		}
+		return nuevaColeccion;
+	}
+	public Cliente[] get() {
+		
+		return copiaProfundaClientes();
+	}
+	
 }
 
 
