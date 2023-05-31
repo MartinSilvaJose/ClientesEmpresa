@@ -3,8 +3,6 @@ package org.iesalandalus.programacion.clientesempresa.modelo.dominio;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Cliente {
 	private String nombre,dni,correo,telefono;
@@ -31,148 +29,165 @@ public class Cliente {
 	}
 		
 	private boolean comprobarLetraDni(String dni) {
-		Pattern pat=Pattern.compile(ER_DNI);
-		Matcher mat=pat.matcher(dni);
-
-		if(!mat.find()) {
-			throw new IllegalArgumentException("ERROR: La letra del dni del cliente no es correcta.");
+		if(dni==null) {
+			throw new NullPointerException("ERROR:No se puede comprobar la letra de un dni nulo.");
 		}
+		if(!dni.matches(ER_DNI)) {
+			throw new IllegalArgumentException("ERROR:El dni no tiene un formato válido.");
+		}
+		int calculo=(Integer.parseInt(dni.substring(0,8)))%23;
+		char letraDni=dni.toUpperCase().charAt(8);
+		char [] letraPosible= {'T','R','W','A','G','M','Y','F','P','D','X','B','N','J','Z','S','Q','V','H','L','C','K','E'};
 		
-		int calculo=0;
-		String extraerLetra=mat.group(2);
-		char letra=Character.toUpperCase(extraerLetra.charAt(0));
-		boolean valido=false;
 		
-		calculo=Integer.parseInt(mat.group(1));
-		calculo=calculo%23;
-		switch(calculo) {
-		case 0:
-			if(letra=='T') {
-				valido=true;
-				break;
-			}
-		case 1:
-			if(letra=='R') {
-				valido=true;
-				break;
-			}
-		case 2:
-			if(letra=='W') {
-				valido=true;
-				break;
-			}
-		case 3:
-			if(letra=='A') {
-				valido=true;
-				break;
-			}
-		case 4:
-			if(letra=='G') {
-				valido=true;
-				break;
-			}
-		case 5:
-			if(letra=='M') {
-				valido=true;
-				break;
-			}
-		case 6:
-			if(letra=='Y') {
-				valido=true;
-				break;
-			}
-		case 7:
-			if(letra=='F') {
-				valido=true;
-				break;
-			}
-		case 8:
-			if(letra=='P') {
-				valido=true;
-				break;
-			}
-		case 9:
-			if(letra=='D') {
-				valido=true;
-				break;
-			}
-		case 10:
-			if(letra=='X') {
-				valido=true;
-				break;
-			}
-		case 11:
-			if(letra=='B') {
-				valido=true;
-				break;
-			}
-		case 12:
-			if(letra=='N') {
-				valido=true;
-				break;
-			}
-		case 13:
-			if(letra=='J') {
-				valido=true;
-				break;
-			}
-		case 14:
-			if(letra=='Z') {
-				valido=true;
-				break;
-			}
-		case 15:
-			if(letra=='S') {
-				valido=true;
-				break;
-			}
-		case 16:
-			if(letra=='Q') {
-				valido=true;
-				break;
-			}
-		case 17:
-			if(letra=='V') {
-				valido=true;
-				break;
-			}
-		case 18:
-			if(letra=='H') {
-				valido=true;
-				break;
-			}
-		case 19:
-			if(letra=='L') {
-				valido=true;
-				break;
-			}
-		case 20:
-			if(letra=='C') {
-				valido=true;
-				break;
-			}
-		case 21:
-			if(letra=='K') {
-				valido=true;
-				break;
-			}
-		case 22:
-			if(letra=='E') {
-				valido=true;
-				break;
-			}
-		default:
-			valido=false;
-			
-		}
-		if(!valido==true) {
-			throw new IllegalArgumentException("ERROR: La letra del dni del cliente no es correcta.");
-		}
-		else {
+		if(letraPosible[calculo]==letraDni)  {
 			return true;
 		}
-
+		else {
+			return false;
+		}
 	}
+//		Pattern pat=Pattern.compile(ER_DNI);
+//		Matcher mat=pat.matcher(dni);
+//
+//		if(!mat.find()) {
+//			throw new IllegalArgumentException("ERROR: La letra del dni del cliente no es correcta.");
+//		}
+//		
+//		int calculo=0;
+//		String extraerLetra=mat.group(2);
+//		char letra=Character.toUpperCase(extraerLetra.charAt(0));
+//		boolean valido=false;
+//		
+//		calculo=Integer.parseInt(mat.group(1));
+//		calculo=calculo%23;
+//		switch(calculo) {
+//		case 0:
+//			if(letra=='T') {
+//				valido=true;
+//				break;
+//			}
+//		case 1:
+//			if(letra=='R') {
+//				valido=true;
+//				break;
+//			}
+//		case 2:
+//			if(letra=='W') {
+//				valido=true;
+//				break;
+//			}
+//		case 3:
+//			if(letra=='A') {
+//				valido=true;
+//				break;
+//			}
+//		case 4:
+//			if(letra=='G') {
+//				valido=true;
+//				break;
+//			}
+//		case 5:
+//			if(letra=='M') {
+//				valido=true;
+//				break;
+//			}
+//		case 6:
+//			if(letra=='Y') {
+//				valido=true;
+//				break;
+//			}
+//		case 7:
+//			if(letra=='F') {
+//				valido=true;
+//				break;
+//			}
+//		case 8:
+//			if(letra=='P') {
+//				valido=true;
+//				break;
+//			}
+//		case 9:
+//			if(letra=='D') {
+//				valido=true;
+//				break;
+//			}
+//		case 10:
+//			if(letra=='X') {
+//				valido=true;
+//				break;
+//			}
+//		case 11:
+//			if(letra=='B') {
+//				valido=true;
+//				break;
+//			}
+//		case 12:
+//			if(letra=='N') {
+//				valido=true;
+//				break;
+//			}
+//		case 13:
+//			if(letra=='J') {
+//				valido=true;
+//				break;
+//			}
+//		case 14:
+//			if(letra=='Z') {
+//				valido=true;
+//				break;
+//			}
+//		case 15:
+//			if(letra=='S') {
+//				valido=true;
+//				break;
+//			}
+//		case 16:
+//			if(letra=='Q') {
+//				valido=true;
+//				break;
+//			}
+//		case 17:
+//			if(letra=='V') {
+//				valido=true;
+//				break;
+//			}
+//		case 18:
+//			if(letra=='H') {
+//				valido=true;
+//				break;
+//			}
+//		case 19:
+//			if(letra=='L') {
+//				valido=true;
+//				break;
+//			}
+//		case 20:
+//			if(letra=='C') {
+//				valido=true;
+//				break;
+//			}
+//		case 21:
+//			if(letra=='K') {
+//				valido=true;
+//				break;
+//			}
+//		case 22:
+//			if(letra=='E') {
+//				valido=true;
+//				break;
+//			}
+//		default:
+//			valido=false;
+//			
+//		}
+//		if(!valido==true) {
+//			throw new IllegalArgumentException("ERROR: La letra del dni del cliente no es correcta.");
+//		}
+//		else {
+//			return true;
+//		}
+
 	
 	public String getNombre() {
 		return nombre;
@@ -199,10 +214,9 @@ public class Cliente {
 		if(dni.trim().isEmpty()) {
 			throw new IllegalArgumentException("ERROR: El dni del cliente no tiene un formato válido.");
 		}
-		if(dni.matches(ER_DNI)) {
-			if(comprobarLetraDni(dni)) {
+
+		if(comprobarLetraDni(dni)) {
 				this.dni = dni;
-			}	
 		}
 		else {
 			throw new IllegalArgumentException("ERROR: El dni del cliente no tiene un formato válido.");

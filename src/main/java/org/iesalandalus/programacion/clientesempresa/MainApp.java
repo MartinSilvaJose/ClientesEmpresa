@@ -17,7 +17,7 @@ public class MainApp {
 	private static void insertarCliente() {
 		try {
 			clientes.insertar(Consola.leerCliente());;
-		}catch(IllegalArgumentException | OperationNotSupportedException e) {
+		}catch(IllegalArgumentException | NullPointerException | OperationNotSupportedException e) {
 			System.out.println(e.getMessage());
 		}
 
@@ -25,7 +25,12 @@ public class MainApp {
 	}
 	private static void buscarCliente() {
 		try {
-			System.out.println(clientes.buscar(Consola.leerClienteDni()));
+			Cliente cliente=clientes.buscar(Consola.leerClienteDni());
+			if(cliente==null) {
+				System.out.println("El cliente que esta buscando no existe.");
+			}else {
+				System.out.println(cliente);
+			}
 		}catch(IllegalArgumentException | NullPointerException e) {
 			System.out.println(e.getMessage());
 		}

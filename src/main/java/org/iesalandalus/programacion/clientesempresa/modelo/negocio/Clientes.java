@@ -34,33 +34,37 @@ public class Clientes {
 	
 	private int buscarIndice(Cliente cliente) {
 		if(cliente==null) {
-			throw new NullPointerException("");
+			throw new NullPointerException("ERROR:No puedes buscar un cliente nulo.");
 		}
-
+		
 		for(int i=0;i<coleccionClientes.length;i++) {
 			if(cliente.equals(coleccionClientes[i])){
 				return i;
 			}
 		}
-		if(coleccionClientes[0]==null) {
-			return tamano;
-		}else {
-			return tamano+1;
-		}
 
+		return tamano;
 	}
 	public void insertar(Cliente cliente) throws OperationNotSupportedException {
 		if(cliente==null){
 			throw new NullPointerException("ERROR: No se puede insertar un cliente nulo.");
 		}
-		int indice=buscarIndice(cliente);
-		if(capacidadSuperada(indice)) {
-			throw new OperationNotSupportedException("ERROR: No se aceptan más clientes.");
+		int indice;
+		if(coleccionClientes[0]!=null) {
+			indice=buscarIndice(cliente);
+			
+		}else {
+			indice=0;
 		}
 
 		if(coleccionClientes[indice]==null) {
-			coleccionClientes[indice]=new Cliente(cliente);
-			tamano++;
+			if(!capacidadSuperada(tamano)) {
+				coleccionClientes[indice]=new Cliente(cliente);
+				tamano++;
+			}else {
+				throw new OperationNotSupportedException("ERROR: No se aceptan más clientes.");
+			}
+
 		}else {
 			throw new OperationNotSupportedException("ERROR: Ya existe un cliente con ese dni.");
 		}
@@ -80,12 +84,16 @@ public class Clientes {
 	}
 	private void desplazarUnaPosicionHaciaIzquierda(int indice) throws OperationNotSupportedException {
 		if(tamanoSuperado(indice) && indice<0) {
-			throw new OperationNotSupportedException("El indice esta fuera de rango.");
+			throw new OperationNotSupportedException("ERROR: El indice esta fuera de rango.");
 		}
-		while(!capacidadSuperada(indice)) {
-			coleccionClientes[indice]=new Cliente(coleccionClientes[indice+1]);
-			indice++;
+		for(int i=indice;i<coleccionClientes.length;i++) {
+			if(coleccionClientes[indice+1]==null) {
+				coleccionClientes[indice]=null;
+			}else {
+				coleccionClientes[indice]=new Cliente(coleccionClientes[indice+1]);
+			}
 		}
+
 	}
 	public void borrar(Cliente cliente) throws OperationNotSupportedException {
 		if(cliente==null){
@@ -94,16 +102,17 @@ public class Clientes {
 		Cliente clienteEncontrado=buscar(cliente);
 		
 		if(clienteEncontrado!=null) {
-			desplazarUnaPosicionHaciaIzquierda(buscarIndice(clienteEncontrado));	
+			desplazarUnaPosicionHaciaIzquierda(buscarIndice(clienteEncontrado));
+			tamano--;
 		}else {
-			throw new OperationNotSupportedException("El cliente que desea borrar no existe.");
+			throw new OperationNotSupportedException("ERROR: No existe ningún cliente como el indicado.");
 		}
 	}
 	private Cliente[] copiaProfundaClientes() {
 		if(coleccionClientes==null) {
 			throw new NullPointerException("ERROR: La coleccion es nula.");
 		}
-		Cliente [] nuevaColeccion=coleccionClientes;
+		Cliente [] nuevaColeccion=new Cliente[capacidad];
 		for(int i=0;i<coleccionClientes.length;i++) {
 			nuevaColeccion[i]=null;
 			if(coleccionClientes[i]!=null) {
